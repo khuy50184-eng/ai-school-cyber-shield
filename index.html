@@ -1,17 +1,99 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI School Cyber Shield</title>
     <meta charset="UTF-8">
+    <title>AI School Cyber Shield</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+        input {
+            width: 60%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .safe { background: #065f46; }
+        .medium { background: #92400e; }
+        .danger { background: #7f1d1d; }
+    </style>
 </head>
 <body>
-    <h1>AI School Cyber Shield</h1>
-    <p>Hệ thống AI phát hiện deepfake và phishing trong môi trường học đường.</p>
 
-    <h2>Kiểm tra link nghi ngờ</h2>
-    <input type="text" placeholder="Nhập link tại đây">
-    <button>Phân tích</button>
+<h1>🛡 AI School Cyber Shield</h1>
+<p>Hệ thống phân tích và cảnh báo link nghi ngờ trong môi trường học đường</p>
 
-    <p>Kết quả sẽ hiển thị ở đây...</p>
+<input type="text" id="urlInput" placeholder="Nhập link cần kiểm tra...">
+<button onclick="analyzeURL()">Phân tích</button>
+
+<div id="output"></div>
+
+<script>
+function analyzeURL() {
+    let url = document.getElementById("urlInput").value.toLowerCase();
+    let riskScore = 0;
+    let reasons = [];
+
+    // Rule-based AI giả lập
+    if (url.includes("free")) {
+        riskScore += 20;
+        reasons.push("Chứa từ 'free' thường dùng trong lừa đảo.");
+    }
+    if (url.includes("verify") || url.includes("account")) {
+        riskScore += 25;
+        reasons.push("Yêu cầu xác minh tài khoản đáng nghi.");
+    }
+    if (url.length > 50) {
+        riskScore += 15;
+        reasons.push("URL quá dài, có thể che giấu nội dung độc hại.");
+    }
+    if (url.includes(".xyz") || url.includes(".top") || url.includes(".click")) {
+        riskScore += 30;
+        reasons.push("Domain ít phổ biến, nguy cơ cao.");
+    }
+
+    let level = "";
+    let className = "";
+
+    if (riskScore < 25) {
+        level = "AN TOÀN";
+        className = "safe";
+    } else if (riskScore < 60) {
+        level = "NGHI NGỜ";
+        className = "medium";
+    } else {
+        level = "NGUY HIỂM";
+        className = "danger";
+    }
+
+    document.getElementById("output").innerHTML =
+        `<div class="result ${className}">
+            <h2>Mức độ rủi ro: ${level} (${riskScore}%)</h2>
+            <p><strong>Phân tích:</strong></p>
+            <ul>${reasons.map(r => `<li>${r}</li>`).join("")}</ul>
+            <p><strong>Khuyến nghị:</strong> Không cung cấp thông tin cá nhân và xác minh lại với nhà trường trước khi hành động.</p>
+        </div>`;
+}
+</script>
+
 </body>
 </html>
