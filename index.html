@@ -1,163 +1,173 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>AI School Cyber Shield</title>
+<meta charset="UTF-8">
+<title>AI School Cyber Shield</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: white;
-            text-align: center;
-            padding: 40px;
-        }
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e0f15, #2b0d0d);
+    color: white;
+    padding: 40px;
+}
 
-        h1 {
-            font-size: 32px;
-        }
+.container {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+}
 
-        input {
-            width: 60%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            margin-top: 20px;
-        }
+.circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 12px solid #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+}
 
-        button {
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: none;
-            background: #3b82f6;
-            color: white;
-            cursor: pointer;
-            margin-left: 10px;
-        }
+.dashboard {
+    flex: 1;
+}
 
-        button:hover {
-            background: #2563eb;
-        }
+.bar-container {
+    margin-bottom: 20px;
+}
 
-        .result {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 12px;
-        }
+.bar-title {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
 
-        .safe { background: #065f46; }
-        .medium { background: #92400e; }
-        .danger { background: #7f1d1d; }
+.bar-bg {
+    width: 100%;
+    height: 12px;
+    background: #333;
+    border-radius: 10px;
+    overflow: hidden;
+}
 
-        .progress-bar {
-            width: 100%;
-            background: #1e293b;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 15px;
-        }
+.bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
 
-        .progress-fill {
-            height: 20px;
-            width: 0%;
-            transition: width 0.6s ease-in-out;
-        }
+input {
+    width: 60%;
+    padding: 10px;
+    margin-top: 20px;
+}
 
-        ul {
-            text-align: left;
-            margin-top: 15px;
-        }
-    </style>
+button {
+    padding: 10px 15px;
+    background: #ef4444;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+</style>
 </head>
 
 <body>
 
-<h1>🛡 AI School Cyber Shield</h1>
-<p>Hệ thống AI phân tích và cảnh báo link nghi ngờ trong môi trường học đường</p>
+<h1>PHISHING DNA FINGERPRINT</h1>
 
 <input type="text" id="urlInput" placeholder="Nhập link cần kiểm tra...">
 <button onclick="analyzeURL()">Phân tích</button>
 
-<div id="output"></div>
+<br><br>
+
+<div class="container">
+
+    <div class="circle" id="riskCircle">
+        0%
+    </div>
+
+    <div class="dashboard">
+
+        <div class="bar-container">
+            <div class="bar-title">Giả mạo thương hiệu</div>
+            <div class="bar-bg">
+                <div id="brandBar" class="bar-fill" style="background:#8b5cf6;"></div>
+            </div>
+        </div>
+
+        <div class="bar-container">
+            <div class="bar-title">Che giấu tên miền</div>
+            <div class="bar-bg">
+                <div id="domainBar" class="bar-fill" style="background:#f59e0b;"></div>
+            </div>
+        </div>
+
+        <div class="bar-container">
+            <div class="bar-title">Thao túng tâm lý</div>
+            <div class="bar-bg">
+                <div id="psychologyBar" class="bar-fill" style="background:#ef4444;"></div>
+            </div>
+        </div>
+
+        <div class="bar-container">
+            <div class="bar-title">Kỹ thuật che giấu SSL</div>
+            <div class="bar-bg">
+                <div id="sslBar" class="bar-fill" style="background:#10b981;"></div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
 
 <script>
 function analyzeURL() {
 
-    const url = document.getElementById("urlInput").value.trim();
-    const resultDiv = document.getElementById("output");
+    const url = document.getElementById("urlInput").value.toLowerCase();
 
-    if (url === "") {
-        resultDiv.innerHTML = "<p style='color:yellow'>Vui lòng nhập link.</p>";
-        return;
-    }
+    if (!url) return;
 
-    let score = 0;
-    let reasons = [];
+    let brand = 0;
+    let domain = 0;
+    let psychology = 0;
+    let ssl = 0;
 
-    if (!url.startsWith("https://")) {
-        score += 2;
-        reasons.push("❌ Không sử dụng HTTPS (thiếu bảo mật)");
-    }
-
-    if (url.length > 50) {
-        score += 1;
-        reasons.push("⚠ Domain quá dài, có thể che giấu mục đích thật");
-    }
-
-    if (/[0-9]/.test(url)) {
-        score += 1;
-        reasons.push("⚠ Có chứa số trong domain (có thể giả mạo thương hiệu)");
-    }
-
-    const suspiciousWords = ["verify", "update", "login", "bank", "free", "secure", "account"];
-    suspiciousWords.forEach(word => {
-        if (url.toLowerCase().includes(word)) {
-            score += 2;
-            reasons.push("🚩 Chứa từ khóa đáng ngờ: " + word);
-        }
+    // Giả mạo thương hiệu
+    const brandWords = ["bank","facebook","zalo","google","momo"];
+    brandWords.forEach(word=>{
+        if(url.includes(word)) brand += 25;
     });
 
-    let level = "";
-    let className = "";
-    let percent = Math.min(score * 20, 100);
+    // Che giấu domain
+    if(url.length > 40) domain += 30;
+    if(/[0-9]/.test(url)) domain += 20;
 
-    if (score >= 5) {
-        level = "🔴 Nguy cơ cao";
-        className = "danger";
-    } else if (score >= 3) {
-        level = "🟡 Nguy cơ trung bình";
-        className = "medium";
-    } else {
-        level = "🟢 Nguy cơ thấp";
-        className = "safe";
-    }
+    // Thao túng tâm lý
+    const urgentWords = ["verify","update","urgent","free","login"];
+    urgentWords.forEach(word=>{
+        if(url.includes(word)) psychology += 25;
+    });
 
-    resultDiv.innerHTML =
-        `<div class="result ${className}">
-            <h2>${level}</h2>
-            <p><strong>Điểm rủi ro:</strong> ${score}</p>
-            <p><strong>Mức độ nguy hiểm:</strong> ${percent}%</p>
+    // SSL giả
+    if(!url.startsWith("https://")) ssl = 40;
 
-            <div class="progress-bar">
-                <div id="progressFill" class="progress-fill"
-                     style="background:${className === 'danger' ? '#ef4444' :
-                                       className === 'medium' ? '#f59e0b' :
-                                       '#10b981'};">
-                </div>
-            </div>
+    let total = Math.min((brand+domain+psychology+ssl)/4,100);
 
-            <ul>${reasons.map(r => `<li>${r}</li>`).join("")}</ul>
+    // Update vòng tròn %
+    const circle = document.getElementById("riskCircle");
+    circle.innerText = Math.round(total) + "%";
+    circle.style.borderColor = total > 60 ? "#ef4444" :
+                               total > 30 ? "#f59e0b" :
+                               "#10b981";
 
-            <p style="margin-top:15px;">
-                <strong>Khuyến nghị:</strong>
-                Không cung cấp thông tin cá nhân và xác minh lại với nhà trường hoặc phụ huynh trước khi hành động.
-            </p>
-        </div>`;
-
-    // Animation thanh %
-    setTimeout(() => {
-        document.getElementById("progressFill").style.width = percent + "%";
-    }, 100);
+    // Update từng thanh
+    document.getElementById("brandBar").style.width = brand + "%";
+    document.getElementById("domainBar").style.width = domain + "%";
+    document.getElementById("psychologyBar").style.width = psychology + "%";
+    document.getElementById("sslBar").style.width = ssl + "%";
 }
 </script>
 
