@@ -49,8 +49,9 @@
 
 <script>
 function analyzeURL() {
-    const url = document.getElementById("linkInput").value;
-    const resultDiv = document.getElementById("result");
+
+    const url = document.getElementById("urlInput").value;
+    const resultDiv = document.getElementById("output");
 
     let score = 0;
     let reasons = [];
@@ -78,33 +79,25 @@ function analyzeURL() {
         }
     });
 
-    let riskLevel = "";
-    let color = "";
+    let level = "";
+    let className = "";
 
     if (score >= 5) {
-        riskLevel = "🔴 Nguy cơ cao";
-        color = "red";
+        level = "🔴 Nguy cơ cao";
+        className = "danger";
     } else if (score >= 3) {
-        riskLevel = "🟡 Nguy cơ trung bình";
-        color = "orange";
+        level = "🟡 Nguy cơ trung bình";
+        className = "medium";
     } else {
-        riskLevel = "🟢 Nguy cơ thấp";
-        color = "green";
+        level = "🟢 Nguy cơ thấp";
+        className = "safe";
     }
 
-    resultDiv.innerHTML = `
-        <h3 style="color:${color}">${riskLevel}</h3>
-        <p><strong>Điểm rủi ro:</strong> ${score}</p>
-        <ul>${reasons.map(r => `<li>${r}</li>`).join("")}</ul>
-    `;
-}
-
-    document.getElementById("output").innerHTML =
+    resultDiv.innerHTML =
         `<div class="result ${className}">
-            <h2>Mức độ rủi ro: ${level} (${riskScore}%)</h2>
-            <p><strong>Phân tích:</strong></p>
+            <h2>${level}</h2>
+            <p><strong>Điểm rủi ro:</strong> ${score}</p>
             <ul>${reasons.map(r => `<li>${r}</li>`).join("")}</ul>
-            <p><strong>Khuyến nghị:</strong> Không cung cấp thông tin cá nhân và xác minh lại với nhà trường trước khi hành động.</p>
         </div>`;
 }
 </script>
