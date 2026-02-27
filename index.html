@@ -96,40 +96,40 @@ function analyzeURL() {
     let score = 0;
     let reasons = [];
 
-    // 1️⃣ Kiểm tra có phải email không
-    const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+    // 1. Kiểm tra email
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (emailPattern.test(url)) {
         score += 40;
         reasons.push("Đây là định dạng email, không phải URL hợp lệ.");
     }
 
-    // 2️⃣ Kiểm tra định dạng URL cơ bản
-    const urlPattern = /^(https?:\\/\\/)?([a-z0-9-]+\\.)+[a-z]{2,}$/;
+    // 2. Kiểm tra URL cơ bản
+    const urlPattern = /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}$/;
     if (!urlPattern.test(url)) {
         score += 30;
         reasons.push("URL không đúng định dạng chuẩn.");
     }
 
-    // 3️⃣ Không có HTTPS
+    // 3. Không có HTTPS
     if (!url.startsWith("https://")) {
         score += 15;
         reasons.push("Không sử dụng HTTPS.");
     }
 
-    // 4️⃣ Có ký tự @ trong URL
+    // 4. Có ký tự @ trong URL
     if (url.includes("@")) {
         score += 25;
-        reasons.push("Có ký tự '@' trong URL (thường dùng để che giấu domain thật).");
+        reasons.push("Có ký tự '@' trong URL (có thể che giấu domain thật).");
     }
 
-    // 5️⃣ Domain là IP
-    const ipPattern = /^(https?:\\/\\/)?\\d+\\.\\d+\\.\\d+\\.\\d+/;
+    // 5. Domain là IP
+    const ipPattern = /^(https?:\/\/)?\d+\.\d+\.\d+\.\d+/;
     if (ipPattern.test(url)) {
         score += 30;
         reasons.push("Sử dụng địa chỉ IP thay vì tên miền.");
     }
 
-    // 6️⃣ Từ khóa nguy hiểm
+    // 6. Từ khóa nguy hiểm
     const dangerWords = ["login","verify","update","free","urgent","bank","account","confirm"];
     dangerWords.forEach(word=>{
         if(url.includes(word)) {
