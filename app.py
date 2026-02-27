@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import math
 import re
+import os
 
 app = Flask(__name__)
 
@@ -17,36 +18,51 @@ def entropy(domain):
 # PHÂN TÍCH URL
 # =========================
 def analyze_url(url):
+
     score = 0
+    reasons = []
 
     domain = re.sub(r'^https?://', '', url).split('/')[0]
 
-    # entropy cao (domain random)
-    if entropy(domain) > 3.8:
+    # 1️⃣ Entropy cao (domain random)
+    ent = entropy(domain)
+    if ent > 3.8:
         score += 25
+        reasons.append("Domain có entropy cao (có thể là domain ngẫu nhiên).")
 
-    # nhiều số
-    if len(re.findall(r'\d', domain)) > 3:
+    # 2️⃣ Nhiều số
+    digit_count = len(re.findall(r'\d', domain))
+    if digit_count > 3:
         score += 15
+        reasons.append("Domain chứa nhiều chữ số bất thường.")
 
-    # nhiều subdomain
+    # 3️⃣ Nhiều subdomain
     if domain.count('.') > 2:
         score += 15
+        reasons.append("Có nhiều subdomain (có thể che giấu domain chính).")
 
-    # từ khóa nguy hiểm
-    danger_words = ["login","verify","update","bank","secure","account"]
+    # 4️⃣ Từ khóa nguy hiểm
+    danger_words = ["login","verify","update","bank","secure","account","confirm","urgent"]
     for word in danger_words:
         if word in url:
             score += 10
+            reasons.append(f"Chứa từ khóa đáng ngờ: {word}")
 
-    # không https
+    # 5️⃣ Không HTTPS
     if not url.startswith("https://"):
-        score += 10
+        score += 15
+        reasons.append("Không sử dụng HTTPS.")
+
+    # 6️⃣ Domain là IP
+    if re.match(r"^(https?:\/\/)?\d+\.\d+\.\d+\.\d+", url):
+        score += 25
+        reasons.append("Sử dụng địa chỉ IP thay vì tên miền.")
 
     if score > 100:
         score = 100
 
-    return score
+    return score, reasons
+
 
 # =========================
 # ROUTE TRANG CHỦ
@@ -55,31 +71,30 @@ def analyze_url(url):
 def home():
     return render_template("index.html")
 
+
 # =========================
 # API PHÂN TÍCH
 # =========================
 @app.route("/analyze", methods=["POST"])
 def analyze():
-    data = request.json
-    url = data["url"].lower()
 
-    score = analyze_url(url)
+    data = request.get_json()
+    url = data.get("url", "").lower()
 
-    # Tính % an toàn (đảo ngược score nguy hiểm)
-    safe_percent = 100 - score
+    if not url:
+        return jsonify({"error": "URL không hợp lệ"}), 400
 
-    if score < 30:
-        status = "An toàn"
-    elif score < 60:
-        status = "Cần xem xét"
-    else:
-        status = "Nguy hiểm"
+    score, reasons = analyze_url(url)
 
     return jsonify({
         "score": score,
-        "safe_percent": safe_percent,
-        "status": status
+        "reasons": reasons
     })
 
+
+# =========================
+# CHẠY SERVER (Render compatible)
+# =========================
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
