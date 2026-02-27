@@ -49,41 +49,55 @@
 
 <script>
 function analyzeURL() {
-    let url = document.getElementById("urlInput").value.toLowerCase();
-    let riskScore = 0;
+    const url = document.getElementById("linkInput").value;
+    const resultDiv = document.getElementById("result");
+
+    let score = 0;
     let reasons = [];
 
-    // Rule-based AI giả lập
-    if (url.includes("free")) {
-        riskScore += 20;
-        reasons.push("Chứa từ 'free' thường dùng trong lừa đảo.");
+    if (!url.startsWith("https://")) {
+        score += 2;
+        reasons.push("❌ Không sử dụng HTTPS");
     }
-    if (url.includes("verify") || url.includes("account")) {
-        riskScore += 25;
-        reasons.push("Yêu cầu xác minh tài khoản đáng nghi.");
-    }
+
     if (url.length > 50) {
-        riskScore += 15;
-        reasons.push("URL quá dài, có thể che giấu nội dung độc hại.");
-    }
-    if (url.includes(".xyz") || url.includes(".top") || url.includes(".click")) {
-        riskScore += 30;
-        reasons.push("Domain ít phổ biến, nguy cơ cao.");
+        score += 1;
+        reasons.push("⚠ Domain quá dài");
     }
 
-    let level = "";
-    let className = "";
+    if (/[0-9]/.test(url)) {
+        score += 1;
+        reasons.push("⚠ Có chứa số trong domain (có thể giả mạo)");
+    }
 
-    if (riskScore < 25) {
-        level = "AN TOÀN";
-        className = "safe";
-    } else if (riskScore < 60) {
-        level = "NGHI NGỜ";
-        className = "medium";
+    const suspiciousWords = ["verify", "update", "login", "bank", "free", "secure", "account"];
+    suspiciousWords.forEach(word => {
+        if (url.toLowerCase().includes(word)) {
+            score += 2;
+            reasons.push("🚩 Chứa từ khóa đáng ngờ: " + word);
+        }
+    });
+
+    let riskLevel = "";
+    let color = "";
+
+    if (score >= 5) {
+        riskLevel = "🔴 Nguy cơ cao";
+        color = "red";
+    } else if (score >= 3) {
+        riskLevel = "🟡 Nguy cơ trung bình";
+        color = "orange";
     } else {
-        level = "NGUY HIỂM";
-        className = "danger";
+        riskLevel = "🟢 Nguy cơ thấp";
+        color = "green";
     }
+
+    resultDiv.innerHTML = `
+        <h3 style="color:${color}">${riskLevel}</h3>
+        <p><strong>Điểm rủi ro:</strong> ${score}</p>
+        <ul>${reasons.map(r => `<li>${r}</li>`).join("")}</ul>
+    `;
+}
 
     document.getElementById("output").innerHTML =
         `<div class="result ${className}">
